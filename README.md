@@ -23,7 +23,12 @@ cd data
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python init_db.py
+python generate_data.py   # -> raw_transactions.csv (synthetic, includes messy rows)
+python run_pipeline.py    # load into payments.db, run clean.sql, print cleaning log
 ```
+
+The pipeline loads `raw_transactions`, then `clean.sql` produces `clean_transactions`
+(typed `amount` REAL, ISO `date`) and a `cleaning_log` table.
 
 ### Server
 ```bash
