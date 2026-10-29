@@ -1,7 +1,7 @@
 """Generate synthetic Canadian merchant transactions with injected messy data.
 
 Writes data/raw_transactions.csv. Output is deterministic for a given seed and
-end date (the 12-month window ends on --end-date, default today).
+end date (the 12-month window ends on --end-date, default 2026-10-31).
 """
 import argparse
 from datetime import date, timedelta
@@ -193,8 +193,8 @@ def inject_mess(df: pd.DataFrame, rng: np.random.Generator) -> tuple[pd.DataFram
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--end-date", type=date.fromisoformat, default=date.today(),
-                        help="last day of the 12-month window (YYYY-MM-DD, default: today)")
+    parser.add_argument("--end-date", type=date.fromisoformat, default=date(2026, 10, 31),
+                        help="last day of the 12-month window (YYYY-MM-DD, default: 2026-10-31)")
     parser.add_argument("--seed", type=int, default=SEED)
     args = parser.parse_args()
 
