@@ -45,8 +45,11 @@ def show(conn: sqlite3.Connection, title: str, query: str) -> None:
     cur = conn.execute(query)
     cols = [d[0] for d in cur.description]
     rows = [[fmt(c, v) for c, v in zip(cols, r)] for r in cur.fetchall()]
-    widths = [max(len(c), *(len(r[i]) for r in rows)) for i, c in enumerate(cols)]
+    widths = [max([len(c)] + [len(r[i]) for r in rows]) for i, c in enumerate(cols)]
     print(f"\n{title}")
+    if not rows:
+        print("none")
+        return
     print("  ".join(c.ljust(w) if i == 0 else c.rjust(w) for i, (c, w) in enumerate(zip(cols, widths))))
     for r in rows:
         print("  ".join(v.ljust(w) if i == 0 else v.rjust(w) for i, (v, w) in enumerate(zip(r, widths))))

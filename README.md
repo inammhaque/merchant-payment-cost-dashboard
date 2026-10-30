@@ -32,6 +32,14 @@ python run_fee_model.py --etransfer-fee 0.50   # test a per-transaction e-Transf
 The pipeline loads `raw_transactions`, then `clean.sql` produces `clean_transactions`
 (typed `amount` REAL, ISO `date`) and a `cleaning_log` table.
 
+### Fee model notes
+
+The `interchange` model prices interchange only. It excludes card-network
+assessments and processor markup, so treat it as a floor, not an all-in
+merchant cost. Compare it with `flat_rate`, which is an all-in provider price.
+Some interchange rows reuse flat-rate figures (see `notes` in
+`fee_assumptions.csv`), e.g. Interac debit, which is not interchange-priced.
+
 ### Server
 ```bash
 cd server

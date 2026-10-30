@@ -4,6 +4,11 @@ flat_rate,credit,standard,in_person,0.025,0,https://squareup.com/ca/en/payments/
 flat_rate,credit,premium,in_person,0.025,0,https://squareup.com/ca/en/payments/our-fees,Square flat rate all cards
 flat_rate,credit,standard,online,0.028,0.30,https://squareup.com/ca/en/payments/our-fees,Square online
 flat_rate,credit,premium,online,0.028,0.30,https://squareup.com/ca/en/payments/our-fees,Square online
-interchange,credit,standard,in_person,0.0109,0,Visa 1.25% (Helcim) / MC Core 0.92% (Mastercard May 2026),avg of networks; verify Visa post Oct 24 2026
-interchange,credit,premium,in_person,0.0157,0,Visa Infinite 1.57% (Helcim) / MC World Elite 1.56% (Mastercard May 2026),avg of networks
+interchange,credit,standard,in_person,0.0109,0,Visa 1.25% (Helcim) / MC Core 0.92% (Mastercard May 2026),avg of networks; Visa rates pre-Oct 24 2026
+interchange,credit,premium,in_person,0.0157,0,Visa Infinite 1.57% (Helcim) / MC World Elite 1.56% (Mastercard May 2026),avg of networks; Visa rates pre-Oct 24 2026
 all,e-transfer,,any,0,0,https://www.bmo.com/main/business/accounts/terms-and-conditions-en.html,$0 to receive at major banks; sensitivity $0-1.50
+interchange,credit,standard,online,0.0151,0,https://merchants.fiserv.com/content/dam/firstdata/ca/en/pdf/FD_Canada_InterchangeRates_CurrentRates.pdf,avg MC Digital Commerce Core 1.67% / Visa CNP token Classic 1.35%
+interchange,credit,premium,online,0.0187,0,https://merchants.fiserv.com/content/dam/firstdata/ca/en/pdf/FD_Canada_InterchangeRates_CurrentRates.pdf,avg MC Digital Commerce World Elite 2.13% / Visa CNP token Infinite 1.60%
+interchange,debit,,in_person,0.0075,0.07,https://squareup.com/ca/en/payments/our-fees,Interac debit not interchange-priced; reuses Square flat rate
+flat_rate,debit,,online,0.029,0.30,https://www.square.com/ca/en/payments/our-fees,Square Online incl. Interac debit via Apple/Google Pay
+interchange,debit,,online,0.029,0.30,https://www.square.com/ca/en/payments/our-fees,reuses Square online debit rate
