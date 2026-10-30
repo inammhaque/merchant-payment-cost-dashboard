@@ -25,6 +25,8 @@ pip install -r requirements.txt
 python init_db.py
 python generate_data.py   # -> raw_transactions.csv (synthetic, includes messy rows)
 python run_pipeline.py    # load into payments.db, run clean.sql, print cleaning log
+python run_fee_model.py   # fee_assumptions.csv -> fee views, prints summaries
+python run_fee_model.py --etransfer-fee 0.50   # test a per-transaction e-Transfer fee
 ```
 
 The pipeline loads `raw_transactions`, then `clean.sql` produces `clean_transactions`
