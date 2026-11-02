@@ -116,12 +116,21 @@ Full write-up: [`docs/findings.md`](docs/findings.md). Underlying tables: [`docs
 
 ## Screenshots
 
-_Placeholders; add images under `docs/screenshots/`._
+**Default view (flat-rate model)**
 
-- **Dashboard overview** (KPI cards, effective rate by payment method and ticket size, fees by category): `docs/screenshots/dashboard.png`
-- **Interchange model with a category filter**: `docs/screenshots/dashboard-interchange.png`
-- **Scenario panel** (sliders, savings by category, break-even ticket sizes): `docs/screenshots/scenario.png`
-- **Dark mode**: `docs/screenshots/dashboard-dark.png`
+![Dashboard, flat-rate model](docs/screenshots/dashboard.png)
+
+**Interchange model**
+
+![Dashboard, interchange model](docs/screenshots/dashboard-interchange.png)
+
+**Scenario panel** (20% shift, $1.50 e-Transfer fee, so the low-ticket categories go negative)
+
+![Scenario panel](docs/screenshots/scenario.png)
+
+**Dark mode**
+
+![Dashboard, dark mode](docs/screenshots/dashboard-dark.png)
 
 ## Limitations
 
