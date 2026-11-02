@@ -47,6 +47,16 @@ npm install
 npm run dev   # http://localhost:3001
 ```
 
+API (reads `data/payments.db`, so run the data steps above first). All three accept
+`model` (`flat_rate` default, or `interchange`), `category` and `ticket_bucket`:
+
+- `GET /api/summary/method`, `/api/summary/category`, `/api/summary/ticket`
+- `GET /api/filters` lists the valid categories and ticket buckets
+
+Filtered results are aggregated from `v_transaction_fees`, because the
+`v_fee_summary_*` views cannot be filtered by another dimension. Unfiltered, they
+match those views.
+
 ### Client
 ```bash
 cd client
