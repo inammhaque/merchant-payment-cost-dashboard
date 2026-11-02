@@ -11,6 +11,8 @@
   --wash: rgba(11, 11, 11, 0.04);
   --series-1: #2a78d6;
   --series-1-hover: #5598e7;
+  --negative: #e34948;
+  --negative-hover: #ec7776;
   --warn-bg: #fff6df;
 }
 @media (prefers-color-scheme: dark) {
@@ -26,6 +28,8 @@
     --wash: rgba(255, 255, 255, 0.05);
     --series-1: #3987e5;
     --series-1-hover: #6da7ec;
+    --negative: #e66767;
+    --negative-hover: #ee8e8e;
     --warn-bg: #3a2f10;
   }
 }
@@ -41,6 +45,8 @@
   --wash: rgba(255, 255, 255, 0.05);
   --series-1: #3987e5;
   --series-1-hover: #6da7ec;
+  --negative: #e66767;
+  --negative-hover: #ee8e8e;
   --warn-bg: #3a2f10;
 }
 
@@ -107,8 +113,27 @@ th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--gri
 th { font-weight: 500; color: var(--text-secondary); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 
+/* scenario */
+.scenario { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--gridline); }
+.scenario-head h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+.scenario-head p { margin: 0; max-width: 760px; color: var(--text-secondary); }
+.sliders { display: flex; flex-wrap: wrap; gap: 16px 32px; margin: 20px 0 16px; }
+.slider { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; width: 320px; max-width: 100%; }
+.slider label { font-size: 12px; color: var(--text-secondary); }
+.slider output { font-weight: 600; font-variant-numeric: tabular-nums; }
+.slider input { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--series-1); }
+.loading-wrap { opacity: 1; }
+.kpi-value.negative { color: var(--negative); }
+.scenario .charts { grid-template-columns: 3fr 2fr; }
+.breakeven { list-style: none; margin: 0; padding: 0; }
+.breakeven li { padding: 10px 0; border-bottom: 1px solid var(--gridline); font-size: 13px; color: var(--text-secondary); }
+.breakeven li:last-child { border-bottom: 0; }
+.be-name { color: var(--text-primary); font-weight: 600; }
+.be-rate { margin-left: 8px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.breakeven strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
 @media (max-width: 760px) {
-  .kpis, .charts { grid-template-columns: 1fr; }
+  .kpis, .charts, .scenario .charts { grid-template-columns: 1fr; }
   select { min-width: 0; width: 100%; }
   .control { flex: 1 1 100%; }
 }

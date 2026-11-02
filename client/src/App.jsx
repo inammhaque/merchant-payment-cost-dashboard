@@ -4,6 +4,7 @@ import { money, pct } from "./format.js";
 import BarCard from "./components/BarCard.jsx";
 import Controls from "./components/Controls.jsx";
 import KpiCards from "./components/KpiCards.jsx";
+import ScenarioPanel from "./components/ScenarioPanel.jsx";
 
 const DEFAULT_FILTERS = { model: "flat_rate", category: "", ticketBucket: "" };
 
@@ -111,6 +112,8 @@ export default function App() {
           </div>
         </>
       )}
+
+      <ScenarioPanel filters={filters} />
     </div>
   );
 }

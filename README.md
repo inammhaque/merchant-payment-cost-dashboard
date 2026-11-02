@@ -52,6 +52,12 @@ API (reads `data/payments.db`, so run the data steps above first). All three acc
 
 - `GET /api/summary/method`, `/api/summary/category`, `/api/summary/ticket`
 - `GET /api/filters` lists the valid categories and ticket buckets
+- `GET /api/scenario?shift_pct=0-50&etransfer_fee=0-1.50` plus the same `model`,
+  `category` and `ticket_bucket` filters: shifts that share of card (credit + debit)
+  transactions to e-Transfer, proportionally and deterministically.
+  `savings = shift x card fees - shift x card txns x etransfer_fee`. Existing
+  e-Transfer volume stays at the current fee. Also returns savings by category and the
+  break-even ticket size (`(fee - card flat fee) / card pct fee`) per card type and channel.
 
 Filtered results are aggregated from `v_transaction_fees`, because the
 `v_fee_summary_*` views cannot be filtered by another dimension. Unfiltered, they
