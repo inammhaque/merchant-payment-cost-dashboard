@@ -14,3 +14,10 @@ export function fetchSummary(kind, { model, category, ticketBucket }, signal) {
   if (ticketBucket) params.set("ticket_bucket", ticketBucket);
   return getJson(`/api/summary/${kind}?${params}`, signal);
 }
+
+export function fetchScenario({ model, category, ticketBucket }, { shiftPct, etransferFee }, signal) {
+  const params = new URLSearchParams({ model, shift_pct: shiftPct, etransfer_fee: etransferFee });
+  if (category) params.set("category", category);
+  if (ticketBucket) params.set("ticket_bucket", ticketBucket);
+  return getJson(`/api/scenario?${params}`, signal);
+}

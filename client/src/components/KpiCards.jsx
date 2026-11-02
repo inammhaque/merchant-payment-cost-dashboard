@@ -1,10 +1,10 @@
 import { int, money, pct } from "../format.js";
 
-function Kpi({ label, value, note }) {
+export function Kpi({ label, value, note, negative = false }) {
   return (
     <div className="kpi">
       <div className="kpi-label">{label}</div>
-      <div className="kpi-value">{value}</div>
+      <div className={`kpi-value${negative ? " negative" : ""}`}>{value}</div>
       <div className="kpi-note">{note}</div>
     </div>
   );
