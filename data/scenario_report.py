@@ -1,0 +1,152 @@
+"""Print (and save) scenario results for a 20% shift of card payments to e-Transfer.
+
+Calls the server's /api/scenario and /api/summary/category endpoints, so the
+numbers come from the same logic the dashboard uses. Start the server first:
+
+    cd server && npm run dev
+    python scenario_report.py [--api-url http://localhost:3001] [--out ../docs/scenario_results.md]
+"""
+import argparse
+import json
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+SHIFT_PCT = 20
+FEES = [0.0, 0.50, 1.00, 1.50]
+MODELS = {"flat_rate": "Flat-rate model", "interchange": "Interchange model"}
+CHANNEL = {"in_person": "in person", "online": "online"}
+
+
+def make_client(base_url: str):
+    def get(path: str, **params) -> dict:
+        url = f"{base_url}{path}?{urllib.parse.urlencode(params)}"
+        try:
+            with urllib.request.urlopen(url, timeout=30) as res:
+                return json.load(res)
+        except urllib.error.URLError as e:
+            sys.exit(f"Could not reach {url} ({e.reason}). Start the API first: cd server && npm run dev")
+    return get
+
+
+def money(v: float) -> str:
+    return f"-${-v:,.2f}" if v < 0 else f"${v:,.2f}"
+
+
+def table(headers: list[str], rows: list[list[str]], left: int = 1) -> list[str]:
+    """Markdown table; the first `left` columns are left-aligned, the rest right-aligned."""
+    align = [":---" if i < left else "---:" for i in range(len(headers))]
+    lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(align) + " |"]
+    lines += ["| " + " | ".join(r) + " |" for r in rows]
+    return lines
+
+
+def average_ticket(get) -> list[str]:
+    rows = get("/api/summary/category", model="flat_rate")["rows"]
+    rows = sorted(rows, key=lambda r: r["merchant_category"])
+    out = [[r["merchant_category"], f"{r['txns']:,}", money(r["volume"]), money(r["volume"] / r["txns"])] for r in rows]
+    txns, volume = sum(r["txns"] for r in rows), sum(r["volume"] for r in rows)
+    out.append(["**All categories**", f"**{txns:,}**", f"**{money(volume)}**", f"**{money(volume / txns)}**"])
+    return table(["Category", "Approved transactions", "Volume", "Average ticket"], out)
+
+
+def savings_table(scen: dict) -> list[str]:
+    """scen: fee -> /api/scenario response for one model."""
+    base = scen[FEES[0]]
+    cats = sorted(r["merchant_category"] for r in base["by_category"])
+    by_fee = {f: {r["merchant_category"]: r for r in s["by_category"]} for f, s in scen.items()}
+    rows = []
+    for c in cats:
+        b = by_fee[FEES[0]][c]
+        rows.append([c, money(b["card_fees"]), f"{b['card_txns']:,}"] + [money(by_fee[f][c]["savings"]) for f in FEES])
+    t = {f: s["totals"] for f, s in scen.items()}
+    rows.append(
+        ["**All categories**", f"**{money(sum(by_fee[FEES[0]][c]['card_fees'] for c in cats))}**",
+         f"**{t[FEES[0]]['card_txns']:,}**"] + [f"**{money(t[f]['savings'])}**" for f in FEES]
+    )
+    headers = ["Category", "Card fees", "Card transactions"] + [f"Savings at {money(f)}" for f in FEES]
+    return table(headers, rows)
+
+
+def totals_table(scen: dict) -> list[str]:
+    rows = []
+    for f in FEES:
+        t = scen[f]["totals"]
+        rows.append([money(f), money(t["current_fees"]), money(t["shifted_fees"]), money(t["etransfer_cost"]),
+                     money(t["new_fees"]), money(t["savings"])])
+    return table(["e-Transfer fee", "Current fees", "Fees avoided", "e-Transfer cost", "New fees", "Savings"], rows)
+
+
+def break_even_table(scen: dict) -> list[str]:
+    def cell(b):
+        return {"above": money(b["break_even_ticket"] or 0), "always_cheaper": "all sizes", "never_cheaper": "none"}[b["e_transfer_cheaper"]]
+
+    keys = [(b["payment_method"], b["card_type"], b["channel"]) for b in scen[FEES[0]]["break_even"]]
+    rows = []
+    for k in keys:
+        pm, card, ch = k
+        first = next(b for b in scen[FEES[0]]["break_even"] if (b["payment_method"], b["card_type"], b["channel"]) == k)
+        name = ("Debit" if pm == "debit" else f"Credit ({card})") + f", {CHANNEL[ch]}"
+        rate = f"{first['card_pct_fee'] * 100:.2f}% + {money(first['card_flat_fee'])}"
+        cells = []
+        for f in FEES:
+            b = next(b for b in scen[f]["break_even"] if (b["payment_method"], b["card_type"], b["channel"]) == k)
+            cells.append(cell(b))
+        rows.append([name, rate] + cells)
+    return table(["Card payment", "Card fee"] + [f"e-Transfer at {money(f)}" for f in FEES], rows, left=2)
+
+
+def build_report(get) -> str:
+    scen = {m: {f: get("/api/scenario", model=m, shift_pct=SHIFT_PCT, etransfer_fee=f) for f in FEES} for m in MODELS}
+    current_fee = scen["flat_rate"][FEES[0]]["current_etransfer_fee"]
+
+    out = [
+        "# Scenario results",
+        "",
+        f"Shift of {SHIFT_PCT}% of card (credit + debit) transactions to e-Transfer, at e-Transfer fees of "
+        + ", ".join(money(f) for f in FEES) + " per transaction, under both pricing models. "
+        "Generated by `data/scenario_report.py` from `/api/scenario`; approved transactions only, no filters.",
+        "",
+        "**Method**",
+        "",
+        f"- Shift is proportional and deterministic: fees avoided = {SHIFT_PCT}% x card fees; "
+        f"e-Transfer cost = {SHIFT_PCT}% x card transactions x e-Transfer fee; savings = fees avoided - e-Transfer cost.",
+        f"- Current fees include existing e-Transfer volume at its current fee ({money(current_fee)}); "
+        "the scenario fee applies only to the shifted transactions.",
+        "- Break-even ticket = (e-Transfer fee - card flat fee) / card percentage fee. e-Transfer is cheaper for tickets "
+        "above it. \"all sizes\" means e-Transfer is cheaper at every ticket size.",
+        "- Category values are rounded to cents individually, so their sums can differ from the totals by a cent.",
+        "- The interchange model covers interchange only (no network assessments or processor markup). "
+        "Debit rates in that model reuse the Square flat-rate figures (see `data/fee_assumptions.csv`).",
+        "",
+        "## Average ticket size by category",
+        "",
+        "Approved transactions, all payment methods.",
+        "",
+        *average_ticket(get),
+    ]
+    for m, title in MODELS.items():
+        out += ["", f"## Savings by category: {title}", "", *savings_table(scen[m]),
+                "", "Totals", "", *totals_table(scen[m])]
+    for m, title in MODELS.items():
+        out += ["", f"## Break-even ticket sizes: {title}", "", *break_even_table(scen[m])]
+    return "\n".join(out) + "\n"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--api-url", default="http://localhost:3001")
+    parser.add_argument("--out", type=Path, default=Path(__file__).parent.parent / "docs" / "scenario_results.md")
+    args = parser.parse_args()
+
+    report = build_report(make_client(args.api_url.rstrip("/")))
+    print(report)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(report, encoding="utf-8")
+    print(f"Saved to {args.out}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

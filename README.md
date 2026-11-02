@@ -40,6 +40,9 @@ merchant cost. Compare it with `flat_rate`, which is an all-in provider price.
 Some interchange rows reuse flat-rate figures (see `notes` in
 `fee_assumptions.csv`), e.g. Interac debit, which is not interchange-priced.
 
+To regenerate `docs/scenario_results.md` (20% shift at e-Transfer fees of $0 to $1.50, both
+models), start the server and run `python scenario_report.py` from `data/`.
+
 ### Server
 ```bash
 cd server
