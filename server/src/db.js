@@ -1,11 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import Database from "better-sqlite3";
+import { DatabaseSync } from "node:sqlite"; // built in (Node 22.13+), no native build
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const DB_PATH = process.env.DB_PATH || path.resolve(here, "../../data/payments.db");
 
-export const db = new Database(DB_PATH, { readonly: true, fileMustExist: true });
+export const db = new DatabaseSync(DB_PATH, { readOnly: true });
 
 const hasView = db
   .prepare("SELECT 1 FROM sqlite_master WHERE type = 'view' AND name = 'v_transaction_fees'")

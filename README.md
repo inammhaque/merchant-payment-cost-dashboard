@@ -9,7 +9,7 @@ The project builds 50,000 synthetic Canadian merchant transactions, cleans them 
 | Layer | Tools |
 |---|---|
 | Data | Python 3.10+, pandas, numpy, SQLite (cleaning and fee model are plain SQL) |
-| API | Node.js 18+, Express, better-sqlite3 (read-only) |
+| API | Node.js 22.13+, Express, Node's built-in `node:sqlite` (read-only, no native build) |
 | Dashboard | React 18, Vite, Recharts |
 
 ## Project structure
@@ -23,7 +23,7 @@ The project builds 50,000 synthetic Canadian merchant transactions, cleans them 
 
 ## Setup and run
 
-Prerequisites: Python 3.10+ and Node.js 18+. Run the steps in this order, because the server reads the database the data steps build.
+Prerequisites: Python 3.10+ and Node.js 22.13+ (any newer version, including the current release, works). Run the steps in this order, because the server reads the database the data steps build.
 
 ### 1. Data pipeline
 
